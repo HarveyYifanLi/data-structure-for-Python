@@ -1,0 +1,178 @@
+class GoToCommand:
+    def __init__(self,x,y,width=1,color="black"):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.color = color
+    
+    # The draw method for each command draws the command
+    # using the given turtle
+    def draw(self,turtle):
+        turtle.width(self.width)
+        turtle.pencolor(self.color)
+        turtle.goto(self.x,self.y)
+    
+    # The __str__ method is a special method that is called
+    # when a command is converted to a string. The string
+    # version of the command is how it appears in the graphics
+    # file format.
+    def __str__(self):
+        return "goto\n" + str(self.x) + "\n" + str(self.y) + "\n" + str(self.width) \
+            + "\n" + self.color
+
+class CircleCommand:
+    def __init__(self,radius, width=1,color="black"):
+        self.radius = radius
+        self.width = width
+        self.color = color
+    
+    def draw(self,turtle):
+        turtle.width(self.width)
+        turtle.pencolor(self.color)
+        turtle.circle(self.radius)
+    
+    def __str__(self):
+        return "circle\n" + str(self.radius) + "\n" + str(self.width) + "\n" + self.color
+
+
+class BeginFillCommand:
+    def __init__(self,color):
+        self.color = color
+    
+    def draw(self,turtle):
+        turtle.fillcolor(self.color)
+        turtle.begin_fill()
+    
+    def __str__(self):
+        return "beginfill\n" + self.color
+
+class EndFillCommand:
+    def __init__(self):
+        pass
+    
+    def draw(self,turtle):
+        turtle.end_fill()
+    
+    def __str__(self):
+        return "endfill"
+
+class PenUpCommand:
+    def __init__(self):
+        pass
+    
+    def draw(self,turtle):
+        turtle.penup()
+    
+    def __str__(self):
+        return "penup"
+
+class PenDownCommand:
+    def __init__(self):
+        pass
+    
+    def draw(self,turtle):
+        turtle.pendown()
+    
+    def __str__(self):
+        return "pendown"
+
+# This is the container class for a graphics sequence. It is meant
+# to hold the graphics commands sequence.
+class PyList:
+    def __init__(self):
+        self.gcList = []
+    
+    # The append method is used to add commands to the sequence.
+    def append(self,item):
+        self.gcList = self.gcList + [item]
+    
+    # This method is used by the undo function. It slices the sequence
+    # to remove the last item
+    def removeLast(self):
+        self.gcList = self.gcList[:-1]
+    
+    # This special method is called when iterating over the sequence.
+    # Each time yield is called another element of the sequence is returned
+    # to the iterator (i.e. the for loop that called this.)
+    def __iter__(self):
+        for c in self.gcList:
+            yield c
+    
+    # This is called when the len function is called on the sequence.
+    def __len__(self):
+        return len(self.gcList)
+
+# This class defines the drawing application. The following line says that
+# the DrawingApplication class inherits from the Frame class. This means
+class DrawingApplication(tkinter.Frame):
+    def __init__(self, master=None):
+        super().__init__(master)
+        self.pack()
+        self.buildWindow()
+        self.graphicsCommands = PyList()
+    
+    # This method is called to load a file containing graphics commands
+    # and add them to the self.graphicsCommands sequence.
+    def loadSequence(self,file):
+        command = file.readline().strip()
+        
+        while command != "":
+            
+            if command == "goto":
+                x = float(file.readline())
+                y = float(file.readline())
+                width = float(file.readline())
+                color = file.readline().strip()
+                cmd = GoToCommand(x,y,width,color)
+            
+            elif command == "circle":
+                radius = float(file.readline())
+                width = int(file.readline())
+                color = file.readline().strip()
+                cmd = CircleCommand(radius,width,color)
+            
+            elif command == "beginfill":
+                color = file.readline().strip()
+                cmd = BeginFillCommand(color)
+            
+            elif command == "endfill":
+                cmd = EndFillCommand()
+            
+            elif command == "penup":
+                cmd = PenUpCommand()
+            
+            elif command == "pendown":
+                cmd = PenDownCommand()
+            else:
+                raise RuntimeError("Unknown Command: " + command)
+            
+            self.graphicsCommands.append(cmd)
+            command = file.readline().strip()
+class Dog:
+    "Define the Constructor Method"
+    def _init_(self,name,month,day,year,speakText):
+        self.name=name
+        self.month=month 
+        self.day=day
+        self.year=year     
+        self.speakText=speakText
+    
+    "Define an Accessor Method, getName() method"
+    "Notice that 'self' is a parameter. Every method has 'self'as its # first parameter. The 'self' parameter is a reference to the current object"
+    
+    def getName(self):
+        return self.name
+    
+    def speak(self):
+        return self.speakText          
+
+    def birthDate(self):
+        return str(self.month)+"/"+str(self.day)+"/"+str(self.year)
+
+    def changeBark(self,bark):
+        self.speakText=bark
+
+    "Define the _add_() method"
+    def _add_(self,otherDog):
+        "Note the _add_ method should return a new object in the Dog class"
+        return Dog("Puppy of "+self.name+" and "+otherDog.name, self.month, self.day, self.year + 1, self.speakText + otherDog.speakText)
